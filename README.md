@@ -96,4 +96,15 @@ $T = \begin{bmatrix} 1 & 0 & 0 & 0 \\\ 0 & 1 & 0 & 0 \\\ 0 & 0 & \frac{1}{1-z_0}
 
 ## 4 - Simulação
 
-- Para começar a simulação, precisamos definir onde serão guardados os parâmetros. Para isso, existirá um arquivo `parameters.py` que descreve uma classe que guardará todos os parâmetros de representação mencionados na seção 3. Como vamos lidar com as duas representações de câmera, atualizaremos o método `__setitem__` para que ele atualize a relação entre os parâmetros `fov, aspect, u_min, v_min, u_max, v_max, d` conforme são atualizados. Também faremos um método `restrict` que altera os parâmetros para que a câmera agora obedeça as condições alcançáveis pela representação restrita.
+- Para começar a simulação, precisamos definir onde serão guardados os parâmetros. Para isso, existirá um arquivo `parameters.py` que descreve uma classe `Parameters` que guardará todos os parâmetros de representação mencionados na seção 3. Como vamos lidar com as duas representações de câmera, atualizaremos o método `__setitem__` para que ele atualize a relação entre os parâmetros `fov, aspect, u_min, v_min, u_max, v_max, d` conforme são atualizados. Também faremos um método `restrict` que altera os parâmetros para que a câmera agora obedeça as condições alcançáveis pela representação restrita.
+
+- Agora, vamos criar a classe `VirtualCamera`, que representa a câmera virtual sendo calculada passo a passo. Ela é composta principalmente dos seguintes métodos:
+
+    - `get_orthonormal_base`: Método que realiza o primeiro processo da normalização, fazendo o algoritmo de **ortonormalização de Gram-Schmidt** para obter a **base ortonormal** $\{u,v,n\}$ que descreve o **espaço da câmera virtual**.
+
+    - `get_view_matrix`: Método que constroi e retorna a **matriz de visualização** $M_V$, que é a matriz de mudança de base que leva objetos do **espaço do mundo** para o **espaço da câmera virtual** descrito pela base ortonormal criada pelo método anterior.
+
+    - `get_normalization_matrix`: Método que constroi e retorna as **matrizes de cisalhamento, escala e transformação projetiva** $M_1, M_2, T$ descritas no documento.
+
+    - `get_full_projection_matrix`: Retorna a matriz resultante do processo total de projeção $T \cdot M_2 \cdot M_1$.
+
