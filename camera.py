@@ -1,4 +1,7 @@
+import math
+import pygame
 import numpy as np
+import OpenGL.GLU as glu
 
 class VirtualCamera:
     def __init__(self, parameters):
@@ -67,3 +70,54 @@ class VirtualCamera:
     def get_full_projection_matrix(self):
         M1, M2, T_proj = self.get_normalization_matrices()
         return T_proj @ (M2 @ M1)
+
+class Observer:
+    def __init__(self):
+        self.pos = np.array([10.0, 8.0, 10.0])
+        self.yaw = -135.0
+        self.pitch = -30.0
+        
+        self.speeds = [0.05, 0.2, 0.6]
+        self.speed_idx = 1
+        self.active = False
+        self.mouse_sensitivity = 0.1
+
+    def toggle_speed(self):
+        self.speed_idx = (self.speed_idx + 1) % len(self.speeds)
+
+    def update_view(self):
+        rad_yaw = math.radians(self.yaw)
+        rad_pitch = math.radians(self.pitch)
+        
+        front = np.array([
+            math.cos(rad_yaw) * math.cos(rad_pitch),
+            math.sin(rad_pitch),
+            math.sin(rad_yaw) * math.cos(rad_pitch)
+        ])
+        
+        target = self.pos + front
+        glu.gluLookAt(self.pos[0], self.pos[1], self.pos[2],
+                      target[0], target[1], target[2],
+                      0, 1, 0)
+
+    def move(self, keys):
+        if not self.active: return
+        
+        s = self.speeds[self.speed_idx]
+        rad_yaw = math.radians(self.yaw)
+        forward = np.array([math.cos(rad_yaw), 0, math.sin(rad_yaw)])
+        right = np.array([-math.sin(rad_yaw), 0, math.cos(rad_yaw)])
+        up = np.array([0, 1, 0])
+        
+        if keys[pygame.K_w]: self.pos += forward * s
+        if keys[pygame.K_s]: self.pos -= forward * s
+        if keys[pygame.K_a]: self.pos -= right * s
+        if keys[pygame.K_d]: self.pos += right * s
+        if keys[pygame.K_e]: self.pos += up * s
+        if keys[pygame.K_q]: self.pos -= up * s
+
+    def rotate(self, rel_x, rel_y):
+        if not self.active: return
+        self.yaw += rel_x * self.mouse_sensitivity
+        self.pitch -= rel_y * self.mouse_sensitivity
+        self.pitch = max(-89, min(89, self.pitch))

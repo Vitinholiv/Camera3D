@@ -108,6 +108,8 @@ $T = \begin{bmatrix} 1 & 0 & 0 & 0 \\\ 0 & 1 & 0 & 0 \\\ 0 & 0 & \frac{1}{1-z_0}
 
     - `get_full_projection_matrix`: Retorna a matriz resultante do processo total de projeção $T \cdot M_2 \cdot M_1$.
 
+- Ainda no `camera.py`, temos a classe `Observer`, que lida com a câmera observadora. Em particular, ela tem as funções de movimentação para permitir que o usuário consiga se mover como observador na simulação. Ela se resume a uma implementação básica com alguns valores *hardcoded* arbitrários. 
+
 - Seguindo, temos o arquivo `geometry.py`, responsável pela parte geométrica de obter e enviar coordenadas de desenho das câmeras. Ele possui dentro dele as funções a seguir:
 
     - `get_frustum_corners`: Método que calcula e retorna as 8 coordenadas do frustum no espaço do mundo que serão usadas para desenhar o frustum na câmera do observador externo.

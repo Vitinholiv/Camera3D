@@ -1,6 +1,6 @@
 import numpy as np
 from OpenGL.GL import GL_LIGHTING, GL_POINTS, GL_LINES
-from OpenGL.GL import glEnable, glDisable, glPointSize, glEnd, glBegin
+from OpenGL.GL import glEnable, glDisable, glPointSize, glLineWidth, glEnd, glBegin
 from OpenGL.GL import glVertex3f, glVertex3fv, glColor3f
 
 PROJECTION_CENTER_COLOR = (1.0, 1.0, 0.0)
@@ -100,11 +100,13 @@ def draw_virtual_camera(camera):
 
 def draw_origin_axes():
     glDisable(GL_LIGHTING)
+    glLineWidth(3.0)
     glBegin(GL_LINES)
-    glColor3f(1.0, 0.0, 0.0); glVertex3f(0.0, 0.0, 0.0); glVertex3f(5.0, 0.0, 0.0)
-    glColor3f(0.0, 1.0, 0.0); glVertex3f(0.0, 0.0, 0.0); glVertex3f(0.0, 5.0, 0.0)
-    glColor3f(0.0, 0.0, 1.0); glVertex3f(0.0, 0.0, 0.0); glVertex3f(0.0, 0.0, 5.0)
+    glColor3f(1.0, 0.0, 0.0); glVertex3f(0.0, 0.0, 0.0); glVertex3f(50.0, 0.0, 0.0)
+    glColor3f(0.0, 1.0, 0.0); glVertex3f(0.0, 0.0, 0.0); glVertex3f(0.0, 50.0, 0.0)
+    glColor3f(0.0, 0.0, 1.0); glVertex3f(0.0, 0.0, 0.0); glVertex3f(0.0, 0.0, 50.0)
     glEnd()
+    glLineWidth(1.0)
     glEnable(GL_LIGHTING)
 
 def draw_xz_grid(size=10, step=1):
@@ -112,9 +114,9 @@ def draw_xz_grid(size=10, step=1):
     glColor3f(0.2, 0.2, 0.2)
     glBegin(GL_LINES)
     for i in range(-size, size + 1, step):
-        glVertex3f(-size, 0, i)
-        glVertex3f(size, 0, i)
-        glVertex3f(i, 0, -size)
-        glVertex3f(i, 0, size)
+        glVertex3f(-size, -0.1, i)
+        glVertex3f(size, -0.1, i)
+        glVertex3f(i, -0.1, -size)
+        glVertex3f(i, -0.1, size)
     glEnd()
     glEnable(GL_LIGHTING)
