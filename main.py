@@ -6,12 +6,12 @@ import OpenGL.GLU as glu
 
 from parameters import Parameters
 from camera import VirtualCamera, Observer
-from gui import process_window_resize, change_gl_mode, draw_ui_borders
+from gui import process_window_resize, change_gl_mode, draw_ui, update_ui_font, Slider
 from geometry import draw_virtual_camera, draw_origin_axes, draw_xz_grid
 
 INITIAL_WINDOW_WIDTH = 1280; INITIAL_WINDOW_HEIGHT = 720
 EXTERNAL_FOV = 60.0; EXTERNAL_ASPECT = 11.0/4.5
-EXTERNAL_NEAR = 0.1; EXTERNAL_FAR = 500.0
+EXTERNAL_NEAR = 0.1; EXTERNAL_FAR = 2000.0
 
 def init_gl_states():
     gl.glClearColor(0.05, 0.05, 0.05, 1.0)
@@ -27,6 +27,16 @@ def update_window_variables(def_w, def_h, delta_w, delta_h):
     obswin_h = int(4.5 * c_h)
     return c_w, c_h, obswin_x, obswin_y, obswin_w, obswin_h
 
+def update_sliders_position(sliders, delta_w, delta_h, c_w, c_h):
+    ui_x = delta_w + 20
+    slider_w = int(5 * c_w) - 40 
+    update_ui_font(c_h)
+
+    sliders[0].update_geometry(ui_x, delta_h + int(7.5 * c_h), slider_w, c_h)
+    sliders[1].update_geometry(ui_x, delta_h + int(6.0 * c_h), slider_w, c_h)
+    sliders[2].update_geometry(ui_x, delta_h + int(4.5 * c_h), slider_w, c_h)
+    sliders[3].update_geometry(ui_x, delta_h + int(3.0 * c_h), slider_w, c_h)
+
 def main():
     pygame.init()
     pygame.display.set_caption("Simulador de Câmera 3D")
@@ -41,6 +51,14 @@ def main():
     params = Parameters()
     cam = VirtualCamera(params)
     clock = pygame.time.Clock()
+
+    sliders = [
+        Slider("FOV", 10.0, 120.0, params.fov, "fov"),
+        Slider("Near", 0.1, 20.0, params.n, "n"),
+        Slider("Far", 10.0, 500.0, params.f, "f"),
+        Slider("Dist Focal", 0.1, 20.0, params.d, "d")
+    ]
+    update_sliders_position(sliders, delta_w, delta_h, c_w, c_h)
     
     while True:
         keys = pygame.key.get_pressed()
@@ -49,6 +67,12 @@ def main():
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit(); sys.exit()
+
+            if not obs.active:
+                mx, my = pygame.mouse.get_pos()
+                my = current_h - my
+                for s in sliders:
+                    s.handle_event(event, (mx, my), params)
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mx, my = pygame.mouse.get_pos()
@@ -75,11 +99,9 @@ def main():
             if event.type == VIDEORESIZE:
                 current_w, current_h = event.w, event.h
                 def_w, def_h, delta_w, delta_h = process_window_resize(current_w, current_h)
+                c_w, c_h, obswin_x, obswin_y, obswin_w, obswin_h = update_window_variables(def_w, def_h, delta_w, delta_h)
+                update_sliders_position(sliders, delta_w, delta_h, c_w, c_h)
                 init_gl_states()
-        
-        # --- Logic and Calculations ---
-
-        c_w, c_h, obswin_x, obswin_y, obswin_w, obswin_h = update_window_variables(def_w, def_h, delta_w, delta_h)
         
         # --- Rendering ---
 
@@ -97,10 +119,8 @@ def main():
         draw_xz_grid(size=50, step=1)
         draw_origin_axes()
         draw_virtual_camera(cam)
-
-        # UI
-        draw_ui_borders(current_w, current_h, delta_w, delta_h, c_w, c_h)
-
+        draw_ui(current_w, current_h, delta_w, delta_h, c_w, c_h, sliders)
+        
         # --- Blit ---
         
         pygame.display.flip()

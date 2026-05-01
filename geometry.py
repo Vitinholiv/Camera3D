@@ -62,9 +62,9 @@ def draw_virtual_camera(camera):
     glColor3f(c1,c2,c3)
     glBegin(GL_LINES)
     # Distance Edges
-    for corner in far_corners:
-        glVertex3fv(C)
-        glVertex3fv(corner)
+    for i in range(len(far_corners)):
+        glVertex3fv(near_corners[i])
+        glVertex3fv(far_corners[i])
     # Near Plane Sides
     for i in range(4):
         glVertex3fv(near_corners[i])
