@@ -6,7 +6,8 @@ import OpenGL.GLU as glu
 
 from parameters import Parameters
 from camera import VirtualCamera, Observer
-from gui import process_window_resize, change_gl_mode, draw_ui, update_ui_font, Slider
+from gui import process_window_resize, change_gl_mode, draw_ui, update_ui_font
+from gui import Button, Slider
 from geometry import draw_virtual_camera, draw_origin_axes, draw_xz_grid
 
 INITIAL_WINDOW_WIDTH = 1280; INITIAL_WINDOW_HEIGHT = 720
@@ -27,15 +28,21 @@ def update_window_variables(def_w, def_h, delta_w, delta_h):
     obswin_h = int(4.5 * c_h)
     return c_w, c_h, obswin_x, obswin_y, obswin_w, obswin_h
 
-def update_sliders_position(sliders, delta_w, delta_h, c_w, c_h):
+def update_sliders_position(sliders_dict, mode, delta_w, delta_h, c_w, c_h, button):
     ui_x = delta_w + 20
-    slider_w = int(5 * c_w) - 40 
+    slider_w = int(5 * c_w) - 40
     update_ui_font(c_h)
+    
+    btn_size = int(c_h * 0.5)
+    button.x = ui_x
+    button.y = delta_h + int(8.4 * c_h)
+    button.width = btn_size
+    button.height = btn_size
 
-    sliders[0].update_geometry(ui_x, delta_h + int(7.5 * c_h), slider_w, c_h)
-    sliders[1].update_geometry(ui_x, delta_h + int(6.0 * c_h), slider_w, c_h)
-    sliders[2].update_geometry(ui_x, delta_h + int(4.5 * c_h), slider_w, c_h)
-    sliders[3].update_geometry(ui_x, delta_h + int(3.0 * c_h), slider_w, c_h)
+    active_sliders = sliders_dict[mode]
+    for i, s in enumerate(active_sliders):
+        y_pos = delta_h + int((7.2 - (i * 0.9)) * c_h)
+        s.update_geometry(ui_x, y_pos, slider_w, c_h)
 
 def main():
     pygame.init()
@@ -52,13 +59,27 @@ def main():
     cam = VirtualCamera(params)
     clock = pygame.time.Clock()
 
-    sliders = [
-        Slider("FOV", 10.0, 120.0, params.fov, "fov"),
-        Slider("Near", 0.1, 20.0, params.n, "n"),
-        Slider("Far", 10.0, 500.0, params.f, "f"),
-        Slider("Dist Focal", 0.1, 20.0, params.d, "d")
-    ]
-    update_sliders_position(sliders, delta_w, delta_h, c_w, c_h)
+    cam_mode = "RESTRICTED" # "RESTRICTED" , "STANDARD"
+    btn_toggle = Button(0, 0, 0, 0, "C")
+    sliders_data = {
+        "STANDARD": [
+            Slider("Near", 0.1, 20.0, params.n, "n"),
+            Slider("Far", 10.0, 1000.0, params.f, "f"),
+            Slider("Focal Dist", 0.1, 20.0, params.d, "d"),
+            Slider("u_min", -2, 0.0, params.u_min, "u_min"),
+            Slider("u_max", 0.0, 2.0, params.u_max, "u_max"),
+            Slider("v_min", -2.0, 0.0, params.v_min, "v_min"),
+            Slider("v_max", 0.0, 2.0, params.v_max, "v_max"),
+        ],
+        "RESTRICTED": [
+            Slider("Near", 0.1, 20.0, params.n, "n"),
+            Slider("Far", 10.0, 100.0, params.f, "f"),
+            Slider("FOV", 10.0, 150.0, params.fov, "fov"),
+            Slider("Aspect Ratio", 0.1, 5.0, params.aspect, "aspect"),
+        ]
+    }
+
+    update_sliders_position(sliders_data, cam_mode, delta_w, delta_h, c_w, c_h, btn_toggle)
     
     while True:
         keys = pygame.key.get_pressed()
@@ -71,8 +92,14 @@ def main():
             if not obs.active:
                 mx, my = pygame.mouse.get_pos()
                 my = current_h - my
-                for s in sliders:
+                for s in sliders_data[cam_mode]:
                     s.handle_event(event, (mx, my), params)
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if btn_toggle.is_clicked(mx, my):
+                        cam_mode = "STANDARD" if cam_mode == "RESTRICTED" else "RESTRICTED"
+                        if cam_mode == "RESTRICTED": params.restrict()
+                        update_sliders_position(sliders_data, cam_mode, delta_w, delta_h, c_w, c_h, btn_toggle)
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mx, my = pygame.mouse.get_pos()
@@ -100,7 +127,7 @@ def main():
                 current_w, current_h = event.w, event.h
                 def_w, def_h, delta_w, delta_h = process_window_resize(current_w, current_h)
                 c_w, c_h, obswin_x, obswin_y, obswin_w, obswin_h = update_window_variables(def_w, def_h, delta_w, delta_h)
-                update_sliders_position(sliders, delta_w, delta_h, c_w, c_h)
+                update_sliders_position(sliders_data, cam_mode, delta_w, delta_h, c_w, c_h, btn_toggle)
                 init_gl_states()
         
         # --- Rendering ---
@@ -119,7 +146,9 @@ def main():
         draw_xz_grid(size=50, step=1)
         draw_origin_axes()
         draw_virtual_camera(cam)
-        draw_ui(current_w, current_h, delta_w, delta_h, c_w, c_h, sliders)
+
+        mode_label = "Câmera - Padrão" if cam_mode == "STANDARD" else "Câmera - Restrita"
+        draw_ui(current_w, current_h, delta_w, delta_h, c_w, c_h, sliders_data[cam_mode], btn_toggle, mode_label)
         
         # --- Blit ---
         
