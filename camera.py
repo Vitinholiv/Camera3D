@@ -6,6 +6,50 @@ import OpenGL.GLU as glu
 class VirtualCamera:
     def __init__(self, parameters):
         self.params = parameters
+        self.active = False
+        self.yaw = -90.0
+        self.pitch = 0.0
+        self.speeds = [0.05, 0.2, 0.6]
+        self.speed_idx = 1
+        self.mouse_sensitivity = 0.1
+
+    def toggle_speed(self):
+        self.speed_idx = (self.speed_idx + 1) % len(self.speeds)
+
+    def rotate(self, rel_x, rel_y):
+        if not self.active: return
+        self.yaw += rel_x * self.mouse_sensitivity
+        self.pitch -= rel_y * self.mouse_sensitivity
+        self.pitch = max(-89, min(89, self.pitch))
+        
+        rad_yaw = math.radians(self.yaw)
+        rad_pitch = math.radians(self.pitch)
+        
+        new_n = [
+            math.cos(rad_yaw) * math.cos(rad_pitch),
+            math.sin(rad_pitch),
+            math.sin(rad_yaw) * math.cos(rad_pitch)
+        ]
+        self.params.N = new_n
+
+    def move(self, keys):
+        if not self.active: return
+        s = self.speeds[self.speed_idx]
+
+        rad_yaw = math.radians(self.yaw)
+        forward = np.array([math.cos(rad_yaw), 0, math.sin(rad_yaw)])
+        right = np.array([-math.sin(rad_yaw), 0, math.cos(rad_yaw)])
+        up = np.array([0,1,0])
+        
+        pos = np.array(self.params.C, dtype=float)
+        if keys[pygame.K_w]: pos += forward * s
+        if keys[pygame.K_s]: pos -= forward * s
+        if keys[pygame.K_a]: pos -= right * s
+        if keys[pygame.K_d]: pos += right * s
+        if keys[pygame.K_e]: pos += up * s
+        if keys[pygame.K_q]: pos -= up * s
+        
+        self.params.C = pos.tolist()
 
     def get_orthonormal_base(self):
         N = np.array(self.params.N, dtype=float)

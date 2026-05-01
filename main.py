@@ -22,11 +22,18 @@ def init_gl_states():
 def update_window_variables(def_w, def_h, delta_w, delta_h):
     c_w = def_w / 16.0
     c_h = def_h / 9.0
+    
     obswin_x = delta_w + int(5 * c_w)
     obswin_y = delta_h 
     obswin_w = int(11 * c_w)
     obswin_h = int(4.5 * c_h)
-    return c_w, c_h, obswin_x, obswin_y, obswin_w, obswin_h
+    
+    camwin_x = obswin_x
+    camwin_y = obswin_y + obswin_h
+    camwin_w = obswin_w
+    camwin_h = obswin_h
+    
+    return c_w, c_h, obswin_x, obswin_y, obswin_w, obswin_h, camwin_x, camwin_y, camwin_w, camwin_h
 
 def update_sliders_position(sliders_dict, mode, delta_w, delta_h, c_w, c_h, button):
     ui_x = delta_w + 20
@@ -50,7 +57,7 @@ def main():
 
     current_w, current_h = INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT
     def_w, def_h, delta_w, delta_h = process_window_resize(current_w, current_h)
-    c_w, c_h, obswin_x, obswin_y, obswin_w, obswin_h = update_window_variables(def_w, def_h, delta_w, delta_h)
+    c_w, c_h, obswin_x, obswin_y, obswin_w, obswin_h, camwin_x, camwin_y, camwin_w, camwin_h = update_window_variables(def_w, def_h, delta_w, delta_h)
 
     init_gl_states()
     
@@ -84,6 +91,7 @@ def main():
     while True:
         keys = pygame.key.get_pressed()
         obs.move(keys)
+        cam.move(keys)
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -103,30 +111,41 @@ def main():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mx, my = pygame.mouse.get_pos()
-                my = current_h - my # GL coordinate inversion
-                in_x_obs = obswin_x <= mx <= obswin_x + obswin_w
-                in_y_obs = obswin_y <= my <= obswin_y + obswin_h
-                
-                if in_x_obs and in_y_obs:
+                my = current_h - my
+            
+                in_obs = obswin_x <= mx <= obswin_x + obswin_w and \
+                         obswin_y <= my <= obswin_y + obswin_h
+                in_cam = camwin_x <= mx <= camwin_x + camwin_w and \
+                         camwin_y <= my <= camwin_y + camwin_h
+
+                if in_obs:
                     if not obs.active:
-                        obs.active = True
-                        pygame.mouse.set_visible(False)
-                        pygame.event.set_grab(True)
-                    else:
-                        obs.toggle_speed()
+                        obs.active = True; cam.active = False # Exclusividade
+                        pygame.mouse.set_visible(False); pygame.event.set_grab(True)
+                    else: obs.toggle_speed()
+                
+                elif in_cam:
+                    if not cam.active:
+                        cam.active = True; obs.active = False # Exclusividade
+                        pygame.mouse.set_visible(False); pygame.event.set_grab(True)
+                    else: cam.toggle_speed()
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 obs.active = False
+                cam.active = False
                 pygame.mouse.set_visible(True)
                 pygame.event.set_grab(False)
 
-            if event.type == pygame.MOUSEMOTION and obs.active:
-                obs.rotate(event.rel[0], event.rel[1])
+            if event.type == pygame.MOUSEMOTION:
+                if obs.active:
+                    obs.rotate(event.rel[0], event.rel[1])
+                elif cam.active:
+                    cam.rotate(event.rel[0], event.rel[1])
                 
             if event.type == VIDEORESIZE:
                 current_w, current_h = event.w, event.h
                 def_w, def_h, delta_w, delta_h = process_window_resize(current_w, current_h)
-                c_w, c_h, obswin_x, obswin_y, obswin_w, obswin_h = update_window_variables(def_w, def_h, delta_w, delta_h)
+                c_w, c_h, obswin_x, obswin_y, obswin_w, obswin_h, camwin_x, camwin_y, camwin_w, camwin_h = update_window_variables(def_w, def_h, delta_w, delta_h)
                 update_sliders_position(sliders_data, cam_mode, delta_w, delta_h, c_w, c_h, btn_toggle)
                 init_gl_states()
         
@@ -134,6 +153,20 @@ def main():
 
         gl.glViewport(0, 0, current_w, current_h)
         gl.glClear(int(gl.GL_COLOR_BUFFER_BIT) | int(gl.GL_DEPTH_BUFFER_BIT))
+
+        # Main Camera
+        gl.glViewport(camwin_x, camwin_y, camwin_w, camwin_h)
+        gl.glMatrixMode(gl.GL_PROJECTION)
+        proj_matrix = cam.get_full_projection_matrix()
+        gl.glLoadMatrixd(proj_matrix.T)
+
+        gl.glMatrixMode(gl.GL_MODELVIEW)
+        view_matrix = cam.get_view_matrix()
+        gl.glLoadMatrixd(view_matrix.T)
+
+        # Objects
+        draw_xz_grid(size=50, step=1)
+        draw_origin_axes()
 
         # External Camera
         gl.glViewport(obswin_x, obswin_y, obswin_w, obswin_h)
