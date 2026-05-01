@@ -3,9 +3,9 @@ import math
 # Default values for the camera
 DEFAULT_C = [0, 0, 0]; DEFAULT_N = [0, 0, -1]; DEFAULT_V = [0, 1, 0]
 DEFAULT_NDIST = 0.1; DEFAULT_FDIST = 100.0; DEFAULT_D = 1.0
-DEFAULT_UMIN = -16.0 / 9.0; DEFAULT_VMIN = -1.0
-DEFAULT_UMAX = 16.0 / 9.0;  DEFAULT_VMAX = 1.0
-DEFAULT_FOV = 90.0; DEFAULT_ASPECT = 16.0/9.0
+DEFAULT_UMIN = -22.0 / 9.0; DEFAULT_VMIN = -1.0
+DEFAULT_UMAX = 22.0 / 9.0;  DEFAULT_VMAX = 1.0
+DEFAULT_FOV = 90.0; DEFAULT_ASPECT = 22.0/9.0
 
 class Parameters:
     def __init__(self,
