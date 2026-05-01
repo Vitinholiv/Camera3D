@@ -98,7 +98,7 @@ $T = \begin{bmatrix} 1 & 0 & 0 & 0 \\\ 0 & 1 & 0 & 0 \\\ 0 & 0 & \frac{1}{1-z_0}
 
 - Para começar a simulação, precisamos definir onde serão guardados os parâmetros. Para isso, existirá um arquivo `parameters.py` que descreve uma classe `Parameters` que guardará todos os parâmetros de representação mencionados na seção 3. Como vamos lidar com as duas representações de câmera, atualizaremos o método `__setitem__` para que ele atualize a relação entre os parâmetros `fov, aspect, u_min, v_min, u_max, v_max, d` conforme são atualizados. Também faremos um método `restrict` que altera os parâmetros para que a câmera agora obedeça as condições alcançáveis pela representação restrita.
 
-- Agora, vamos criar a classe `VirtualCamera`, que representa a câmera virtual sendo calculada passo a passo. Ela é composta principalmente dos seguintes métodos:
+- Agora, no arquivo `camera.py`, vamos criar a classe `VirtualCamera`, que representa a câmera virtual sendo calculada passo a passo. Ela é composta principalmente pelas seguintes funções:
 
     - `get_orthonormal_base`: Método que realiza o primeiro processo da normalização, fazendo o algoritmo de **ortonormalização de Gram-Schmidt** para obter a **base ortonormal** $\{u,v,n\}$ que descreve o **espaço da câmera virtual**.
 
@@ -108,3 +108,12 @@ $T = \begin{bmatrix} 1 & 0 & 0 & 0 \\\ 0 & 1 & 0 & 0 \\\ 0 & 0 & \frac{1}{1-z_0}
 
     - `get_full_projection_matrix`: Retorna a matriz resultante do processo total de projeção $T \cdot M_2 \cdot M_1$.
 
+- Seguindo, temos o arquivo `geometry.py`, responsável pela parte geométrica de obter e enviar coordenadas de desenho das câmeras. Ele possui dentro dele as funções a seguir:
+
+    - `get_frustum_corners`: Método que calcula e retorna as 8 coordenadas do frustum no espaço do mundo que serão usadas para desenhar o frustum na câmera do observador externo.
+
+    - `draw_virtual_camera`: Desenha a estrutura da câmera virtual no espaço do observador externo.
+
+    - `draw_origin_axis`: Desenha os três eixos $x,y,z$ na origem no observador externo.
+
+    - `draw_xz_grid`: Desenha uma grade quadriculada no plano gz para melhor ambientação.
