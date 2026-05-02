@@ -83,32 +83,33 @@ class VirtualCamera:
 
         I_u = (p.u_min + p.u_max) / 2.0
         I_v = (p.v_min + p.v_max) / 2.0
-
         s_u = (p.u_max - p.u_min) / 2.0
         s_v = (p.v_max - p.v_min) / 2.0
-        
+
         M1 = np.array([
             [1, 0, -I_u / p.d, 0],
             [0, 1, -I_v / p.d, 0],
             [0, 0, 1,          0],
             [0, 0, 0,          1]
         ], dtype=float)
-        
+
         M2 = np.array([
             [p.d / (s_u * p.f), 0,                 0,     0],
             [0,                 p.d / (s_v * p.f), 0,     0],
             [0,                 0,                 1/p.f, 0],
             [0,                 0,                 0,     1]
         ], dtype=float)
-        
-        z0 = p.n / p.f
+
+        a_z = (p.f + p.n) / (p.f - p.n)
+        b_z = -2.0 * p.n  / (p.f - p.n)
+
         T_proj = np.array([
-            [1, 0, 0,            0],
-            [0, 1, 0,            0],
-            [0, 0, 1/(1-z0),    -z0/(1-z0)],
-            [0, 0, 1,            0]
+            [1, 0, 0,   0  ],
+            [0, 1, 0,   0  ],
+            [0, 0, a_z, b_z],
+            [0, 0, 1,   0  ]
         ], dtype=float)
-        
+
         return M1, M2, T_proj
 
     def get_full_projection_matrix(self):

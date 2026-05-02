@@ -120,4 +120,8 @@ $T = \begin{bmatrix} 1 & 0 & 0 & 0 \\\ 0 & 1 & 0 & 0 \\\ 0 & 0 & \frac{1}{1-z_0}
 
     - `draw_xz_grid`: Desenha uma grade quadriculada no plano gz para melhor ambientação.
 
-- E além desses, temos o arquivo `gui.py`, responsável pela interface gráfica de usuário para variação dos parâmetros e controle do cenário. Ele contém classes que representam os elementos da GUI como `Button` e `Slider` e também funções auxiliares para fazer a GUI de forma mais fácil, mas não é relevante para o entendimento de como a câmera funciona de fato. 
+- O arquivo `objects.py` é um arquivo que descreve objetos 3D para serem colocados no espaço do mundo, fornecendo mais conteúdos para observar como a câmera se comporta de acordo com a geometria e distorções feitas pelos parâmetros.
+
+- Além desses, temos o arquivo `gui.py`, responsável pela interface gráfica de usuário para variação dos parâmetros e controle do cenário. Ele contém classes que representam os elementos da GUI como `Button` e `Slider` e também funções auxiliares para fazer a GUI de forma mais fácil, mas não é relevante para o entendimento de como a câmera funciona de fato. 
+
+- Finalmente, temos o arquivo `main.py`, responsável por inicializar o simulador, gerenciar os eventos de input e juntar os outros arquivos, fazendo-os interagir entre si. Dê uma olhada!
