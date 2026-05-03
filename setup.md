@@ -1,3 +1,5 @@
+Digite no terminal uma linha por vez.
+
 **Windows**
 
 ```
