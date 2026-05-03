@@ -30,13 +30,17 @@ Começaremos com definições e explicações importantes para o projeto. Nosso 
 
 - A pirâmide de visão pode ser torta dependendo dos parâmetros da câmera, por isso, aplicamos uma transformação de normalização nela, fazendo um cisalhamento e escala para ela se tornar uma pirâmide reta e simétrica. Seja $(I_u,I_v)$ o centro da tela virtual, onde definimos metade das dimensões de largura dela como $s_u,s_v$. Com isso, primeiro deslocamos as coordenadas de acordo com a seguinte matriz:
 
-$M_1 = \begin{bmatrix} 1 & 0 & \frac{-I_u}{d} & 0 \\\ 0 & 1 & \frac{-I_v}{d} & 0 \\\ 0 & 0 & 1 & 0 \\\ 0 & 0 & 0 & 1 \end{bmatrix}$
+```math
+M_1 = \begin{bmatrix} 1 & 0 & \frac{-I_u}{d} & 0 \\ 0 & 1 & \frac{-I_v}{d} & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}
+```
 
 - Podemos ver que ela faz um ponto $(u,v,z)$ ser deslocado de modo que ele permaneça na mesma coordenada $z$, porém suas coordenadas $x,y$ são deslocadas de modo que o centro da imagem coincida com o eixo ótico.
 
 - Agora, faremos uma escala para a região da pirâmide na coordenada $z$ paralela ao plano de projeção ser dada por $\{(x,y) : -z \leq x \leq z, -z \leq y \leq z\}$, também normalizando de modo que o plano posterior esteja em $z=1$. Para isso, multiplicaremos pela matriz:
 
-$M_2 = \begin{bmatrix} \frac{d}{s_u \cdot f} & 0 & 0 & 0 \\\ 0 & \frac{d}{s_v \cdot f} & 0 & 0 \\\ 0 & 0 & \frac{1}{f} & 0 \\\ 0 & 0 & 0 & 1 \end{bmatrix}$
+```math
+M_2 = \begin{bmatrix} \frac{d}{s_u \cdot f} & 0 & 0 & 0 \\\ 0 & \frac{d}{s_v \cdot f} & 0 & 0 \\\ 0 & 0 & \frac{1}{f} & 0 \\\ 0 & 0 & 0 & 1 \end{bmatrix}
+```
 
 - Dadas essas transformações, nossa câmera agora enxerga uma pirâmide de base quadrada com lado 2 e altura 1, cortada pelo plano anterior em algum local de topo, no plano anterior pós normalização.
 
@@ -46,7 +50,9 @@ $M_2 = \begin{bmatrix} \frac{d}{s_u \cdot f} & 0 & 0 & 0 \\\ 0 & \frac{d}{s_v \c
 
 - Precisamos primeiro levar a coordenada $z=\frac{n}{f}$ para $z=0$. Seja $z_0=\frac{n}{f}$. Podemos fazer isso de muitas formas, mas veja que precisamos fixar o plano posterior para que ele permaneça no mesmo local, e além disso, as paredes da pirâmide precisam se tornar retas paralelas para facilitar o cálculo de pertencimento à região de visão. Faremos isso com a matriz de transformação:
 
-$T = \begin{bmatrix} 1 & 0 & 0 & 0 \\\ 0 & 1 & 0 & 0 \\\ 0 & 0 & \frac{1}{1-z_0} & \frac{-z_0}{1 - z_0} \\\ 0 & 0 & 1 & 0 \end{bmatrix}$
+```math
+T = \begin{bmatrix} 1 & 0 & 0 & 0 \\\ 0 & 1 & 0 & 0 \\\ 0 & 0 & \frac{1}{1-z_0} & \frac{-z_0}{1 - z_0} \\\ 0 & 0 & 1 & 0 \end{bmatrix}
+```
 
 - Veja que essa transformação faz o deslocamento do espaço um pouco para trás e depois o expande para preservar a posição do plano posterior enquanto leva o anterior para zero. Porém, ainda temos um formato de frustum, e não um paralelepípedo. Para corrigir isso, guardaremos em cada ponto seu valor antigo da coordeanda $z$ na quarta dimensão adicional $w$. Isso acontece pois com essa informação, agora podemos usar o OpenGL para dividir as coordenadas dos eixos $X,Y$ por o valor guardado da coordeanda $z$, que tem o efeito de levar as bordas da pirâmide às bordas do paralelepípedo, como queríamos.
 
