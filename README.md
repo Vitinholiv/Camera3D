@@ -1,6 +1,6 @@
 # Virtual Camera 3D
 
-Nesse projeto, o objetivo é implementar uma Câmera 3D, tomando como base um modelo de uma câmara escura (pinhole camera) e seguindo o livro *Computer Graphics, Theory and Practice* de *Jonas Gomes e Luiz Velho*.
+Nesse projeto, o objetivo é implementar uma Câmera 3D, tomando como base um modelo de uma câmara escura (pinhole camera) e seguindo o livro *Computer Graphics, Theory and Practice* de *Jonas Gomes e Luiz Velho*. Para instalação, veja o arquivo `setup.md`.
 
 ## 1 - Definições
 
