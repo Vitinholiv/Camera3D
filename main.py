@@ -80,6 +80,8 @@ def main():
     pygame.init()
     pygame.display.set_caption("Simulador de Câmera 3D")
 
+    # --- Init ---
+
     current_w, current_h = INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT
     def_w, def_h, delta_w, delta_h = process_window_resize(current_w, current_h)
     c_w, c_h, obswin_x, obswin_y, obswin_w, obswin_h, \
@@ -129,6 +131,8 @@ def main():
         obs.move(keys)
         cam.move(keys)
 
+        # --- Events ---
+
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit(); sys.exit()
@@ -157,7 +161,6 @@ def main():
                         pygame.mouse.set_visible(False); pygame.event.set_grab(True)
             else:
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    # Clique muda a velocidade em ciclo
                     if obs.active: obs.toggle_speed()
                     if cam.active: cam.toggle_speed()
 
