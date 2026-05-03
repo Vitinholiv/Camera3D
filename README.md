@@ -16,7 +16,7 @@ Começaremos com definições e explicações importantes para o projeto. Nosso 
 
 - Também definimos um vetor $V$, o **vetor de inclinação** da câmera. O plano dos vetores $N$ e $V$ é o **plano vertical longitudinal** da câmera, onde rotacionar esse plano ao redor do eixo ótico nos dá a noção de inclinação da câmera em relação ao espaço do mundo.
 
-- Para definir precisamente o sistema de coordenadas da câmera, precisamos de uma base ortonormal. Já temos o centro $C$ e o vetor normal do eixo ótico **n**. Em seguida, definimos o **vetor vertical** da câmera como $v=\frac{V-\langle V,n \rangle n}{||V-\langle V,n \rangle n||}$. Também obtemos o **vetor lateral** da câmera (representando a direita) com $u = n \times v$. O conjunto $(C,\{u,v,n\})$ define o **espaço da câmera virtual**.
+- Para definir precisamente o sistema de coordenadas da câmera, precisamos de uma base ortonormal. Já temos o centro $C$ e o vetor normal do eixo ótico $N'$. Em seguida, definimos o **vetor vertical** da câmera como $v=\frac{V-\langle V,N' \rangle N'}{||V-\langle V,N' \rangle N'||}$. Também obtemos o **vetor lateral** da câmera (representando a direita) com $u = N' \times v$. O conjunto $(C,\{u,v,N'\})$ define o **espaço da câmera virtual**.
 
 - O ponto onde o eixo ótico fura o plano de projeção é chamado de **ponto principal**. Usando esse ponto e os vetores $u$ e $v$, estabelece-se um sistema de coordenadas no plano de projeção, chamado de espaço da imagem. Dentro desse plano, delimitamos uma janela retangular chamada **tela virtual**, especificada pelos seus cantos $(u_{min}, v_{min})$ e $(u_{max}, v_{max})$. Ela atua como um molde da imagem final.
 
