@@ -2,6 +2,15 @@
 
 Nesse projeto, o objetivo é implementar uma Câmera 3D, tomando como base um modelo de uma câmara escura (pinhole camera) e seguindo o livro *Computer Graphics, Theory and Practice* de *Jonas Gomes e Luiz Velho*. Para instalação, veja o arquivo `setup.md`.
 
+## 0 - Controles
+
+- Clique no botão `C` da interface para alterar a câmera entre o modo restrito e padrão.
+- Clique no botão `F` da interface para alterar o modo do Frustum para arestas ou faces.
+- Arraste os sliders para controlar os parâmetros da câmera.
+- Clique na tela de uma das câmeras (visual ou observadora) para ativar o modo de navegação.
+- Aperte `ESC` para sair do modo de navegação.
+- No modo de navegação, se movemente usando o mouse e os botões `W A S D Q E`. Clique na tela para alterar velocidade de movimento.
+
 ## 1 - Definições
 
 Começaremos com definições e explicações importantes para o projeto. Nosso cenário é:
