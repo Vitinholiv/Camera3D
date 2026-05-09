@@ -9,7 +9,7 @@ from camera import VirtualCamera, Observer
 from gui import process_window_resize, change_gl_mode, draw_ui, update_ui_font
 from gui import Button, Slider
 from geometry import draw_virtual_camera, draw_origin_axes, draw_xz_grid, get_frustum_planes
-from objects import Sphere
+from objects import world_objects
 
 INITIAL_WINDOW_WIDTH  = 1280
 INITIAL_WINDOW_HEIGHT = 720
@@ -118,10 +118,6 @@ def main():
             Slider("Aspect Ratio", 0.1,   5.0,  "aspect"),
         ],
     }
-
-    world_objects = [
-        Sphere(position=[5, 2, 5], radius=2.0, color=(1.0, 0.5, 0.5))
-    ]
 
     update_sliders_position(sliders_data, cam_mode, delta_w, delta_h,
                             c_w, c_h, btn_cam_mode, btn_frustum)
