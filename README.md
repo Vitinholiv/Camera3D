@@ -19,31 +19,45 @@ Começaremos com definições e explicações importantes para o projeto. Nosso 
 
 - Para cada objeto do mundo, vamos considerar um **espaço do objeto**, que é um sistema de coordenadas definido de acordo com a geometria do objeto e orientado em referencial a ele.
 
-- No sistema de coordenadas do mundo, existe um ponto $C$ chamado de **centro de projeção**, que é o local que representa onde a câmera deve estar enxergando. Também há um vetor $N$ chamado de **vetor do eixo ótico**, indicando a direção onde a câmera deve estar olhando. A reta definida por esse vetor é o **eixo ótico**. Nesse contexto, geralmente normalizamos esse vetor tomando $N' = \frac{N}{||N||}$, sendo o **vetor normal do eixo ótico**, pertencendo ao sistema de referência da câmera.
+- No sistema de coordenadas do mundo, existe um ponto $C$ chamado de **centro de projeção**, que é o local que representa onde a câmera deve estar enxergando. Também há um vetor $N$ chamado de **vetor do eixo ótico**, indicando a direção onde a câmera deve estar olhando. A reta definida por esse vetor é o **eixo ótico**. Nesse contexto, geralmente normalizamos esse vetor tomando $w = \frac{N}{||N||}$, sendo o **vetor normal do eixo ótico**, pertencendo ao sistema de referência da câmera.
 
 - Além disso, há uma distância $d$ do centro de projeção e perpendicular ao vetor $N$, há um plano retangular chamado de **plano de projeção**, onde $d$ é a **distância focal** da câmera.
 
 - Também definimos um vetor $V$, o **vetor de inclinação** da câmera. O plano dos vetores $N$ e $V$ é o **plano vertical longitudinal** da câmera, onde rotacionar esse plano ao redor do eixo ótico nos dá a noção de inclinação da câmera em relação ao espaço do mundo.
 
-- Para definir precisamente o sistema de coordenadas da câmera, precisamos de uma base ortonormal. Já temos o centro $C$ e o vetor normal do eixo ótico $N'$. Em seguida, definimos o **vetor vertical** da câmera como $v=\frac{V-\langle V,N' \rangle N'}{||V-\langle V,N' \rangle N'||}$. Também obtemos o **vetor lateral** da câmera (representando a direita) com $u = N' \times v$. O conjunto $(C,\{u,v,N'\})$ define o **espaço da câmera virtual**.
+- Para definir precisamente o sistema de coordenadas da câmera, precisamos de uma base ortonormal. Já temos o centro $C$ e o vetor normal do eixo ótico $w$. Em seguida, definimos o **vetor vertical** da câmera como $v=\frac{V-\langle V,w \rangle w}{||V-\langle V,w \rangle w||}$. Também obtemos o **vetor lateral** da câmera (representando a direita) com $u = w \times v$. O conjunto $(C,\{u,v,w\})$ define o **espaço da câmera virtual**.
 
 - O ponto onde o eixo ótico fura o plano de projeção é chamado de **ponto principal**. Usando esse ponto e os vetores $u$ e $v$, estabelece-se um sistema de coordenadas no plano de projeção, chamado de espaço da imagem. Dentro desse plano, delimitamos uma janela retangular chamada **tela virtual**, especificada pelos seus cantos $(u_{min}, v_{min})$ e $(u_{max}, v_{max})$. Ela atua como um molde da imagem final.
 
 - O conjunto de semi-retas que partem do centro de projeção $C$ e passam pelas bordas da tela virtual forma uma pirâmide de base retangular no espaço, a **pirâmide de visão**. O raio que sai de $C$ e passa exatamente pelo centro da tela virtual é chamado de **eixo de visão**, que pode ser oblíquo e não coincidir com o eixo ótico, caso a tela virtual seja descentrada.
 
-- Modelar a câmera apenas com a pirâmide estendendo-se ao infinito cria problemas: a projeção de pontos muito próximos ao centro $C$ gera divisões por zero e pontos muito distantes causam erros de precisão numérica. Para resolver isso, definimos dois planos paralelos ao plano de projeção: o **plano anterior**, situado a uma distância $n$ de $C$, e o **plano posterior**, situado a uma distância $f$. Idealmente, o plano anterior é o plano mais próximo da câmera, e o posterior o mais distance. Queremos que o plano de projeção esteja entre esses dois planos, onde todos eles estão na frente do centro de projeção.
+- Modelar a câmera apenas com a pirâmide estendendo-se ao infinito cria problemas: a projeção de pontos muito próximos ao centro $C$ gera divisões por zero e pontos muito distantes causam erros de precisão numérica. Para resolver isso, definimos dois planos paralelos ao plano de projeção: o **plano anterior**, situado a uma distância $n$ de $C$, e o **plano posterior**, situado a uma distância $f$. Idealmente, o plano anterior é o plano mais próximo da câmera, e o posterior o mais distante. Queremos que o plano de projeção esteja entre esses dois planos, onde todos eles estão na frente do centro de projeção.
 
 - Ao cortar a pirâmide de visão pelos planos anterior e posterior, temos agora um **tronco de pirâmide** ou **frustum** que chamamos de **volume de visão**. Só veremos na câmera o que estiver dentro dele, pois descartaremos o que estiver fora.
 
+- A orientação da câmera pode ser alternativamente descrita pelos **ângulos de Euler**: o **roll** é o ângulo de rotação em torno do eixo ótico; o **pan** é o ângulo de rotação em torno do eixo vertical; e o **tilt** é a rotação em torno do eixo lateral da câmera.
+
 ## 2 - Normalização
 
-- A pirâmide de visão pode ser torta dependendo dos parâmetros da câmera, por isso, aplicamos uma transformação de normalização nela, fazendo um cisalhamento e escala para ela se tornar uma pirâmide reta e simétrica. Seja $(I_u,I_v)$ o centro da tela virtual, onde definimos metade das dimensões de largura dela como $s_u,s_v$. Com isso, primeiro deslocamos as coordenadas de acordo com a seguinte matriz:
+O processo completo de visualização é uma sucessão de mudanças de sistemas de coordenadas, seguindo o pipeline:
+
+$$\text{Cena} \xrightarrow{V} \text{Câmera} \xrightarrow{M} \text{Normalização} \xrightarrow{T} \text{Ordenação} \xrightarrow{D} \text{Dispositivo}$$
+
+- Seja $O$ a origem do espaço do mundo. O vetor $\overrightarrow{OC} = (C_x,C_y,C_z)$ é o vetor de posição do centro de projeção em relação a essa origem.
+
+- A primeira transformação é a mudança do espaço da cena para o espaço da câmera, dada pela matriz $V$. Seu objetivo é substituir o referencial da cena pelo referencial da câmera, colocando o centro de projeção na origem e o eixo ótico ao longo do eixo $z$. Na prática, aplicamos na verdade a matriz inversa de $V$ aos objetos para levá-los ao espaço da câmera. A inversa $V^{-1}$ é obtida por uma matriz de translação pelo vetor $\overrightarrow{OC}$ seguida de uma rotação que leva a base canônica ao referencial $\{u,v,w\}$. Segue que:
+
+```math
+V = \begin{bmatrix} u_x & u_y & u_z & -\langle \overrightarrow{OC}, u \rangle \\ v_x & v_y & v_z & -\langle \overrightarrow{OC}, v \rangle \\ w_x & w_y & w_z & -\langle \overrightarrow{OC}, w \rangle \\ 0 & 0 & 0 & 1 \end{bmatrix}
+```
+
+- A pirâmide de visão pode ser torta dependendo dos parâmetros da câmera, por isso, aplicamos uma transformação de normalização nela, fazendo um cisalhamento e escala para ela se tornar uma pirâmide reta e simétrica. Seja $(I_u,I_v)$ o centro da tela virtual. Definimos também metade das dimensões de largura e altura dela como $s_u,s_v$=$\frac{u_{max}-u_{min}}{2},\frac{v_{max}-v_{min}}{2}$. Com isso, obtemos $I_u = u_{min}+s_u$, $I_v = v_{min}+s_v$. Agora deslocamos as coordenadas de acordo com a seguinte matriz:
 
 ```math
 M_1 = \begin{bmatrix} 1 & 0 & \frac{-I_u}{d} & 0 \\ 0 & 1 & \frac{-I_v}{d} & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}
 ```
 
-- Podemos ver que ela faz um ponto $(u,v,z)$ ser deslocado de modo que ele permaneça na mesma coordenada $z$, porém suas coordenadas $x,y$ são deslocadas de modo que o centro da imagem coincida com o eixo ótico.
+- Podemos ver que ela faz um ponto $(x,y,z)$ ser deslocado de modo que ele permaneça na mesma coordenada $z$, porém suas coordenadas $x,y$ são deslocadas de modo que o centro da imagem coincida com o eixo ótico.
 
 - Agora, faremos uma escala para a região da pirâmide na coordenada $z$ paralela ao plano de projeção ser dada por $\{(x,y) : -z \leq x \leq z, -z \leq y \leq z\}$, também normalizando de modo que o plano posterior esteja em $z=1$. Para isso, multiplicaremos pela matriz:
 
@@ -51,9 +65,9 @@ M_1 = \begin{bmatrix} 1 & 0 & \frac{-I_u}{d} & 0 \\ 0 & 1 & \frac{-I_v}{d} & 0 \
 M_2 = \begin{bmatrix} \frac{d}{s_u \cdot f} & 0 & 0 & 0 \\\ 0 & \frac{d}{s_v \cdot f} & 0 & 0 \\\ 0 & 0 & \frac{1}{f} & 0 \\\ 0 & 0 & 0 & 1 \end{bmatrix}
 ```
 
-- Dadas essas transformações, nossa câmera agora enxerga uma pirâmide de base quadrada com lado 2 e altura 1, cortada pelo plano anterior em algum local de topo, no plano anterior pós normalização.
+- Dadas essas transformações, nossa câmera agora enxerga uma pirâmide de base quadrada com lado 2 e altura 1, cortada pelo plano anterior em algum local de topo, no plano anterior pós normalização. A matriz completa dessas transformações é $M=M_2 \cdot M_1$
 
-- Por fim, faremos uma transformação para um **espaço de visibilidade**, criado para determinarmos rapidamente quais os objetos estão na frente dos outros, na ocasião de objetos no mundo tampando os outros. Sem um sistema de coordenadas apropriado, isso é computacionalmente caro.
+- Por fim, faremos uma transformação para um espaço de ordenação, criado para determinarmos rapidamente quais os objetos estão na frente dos outros, na ocasião de objetos no mundo tampando os outros. Sem um sistema de coordenadas apropriado, isso é computacionalmente caro.
 
 - Retomando o nosso espaço normalizado, temos o espaço $\{(x,y,z) : -z \leq x \leq z, -z \leq y \leq z, \frac{n}{f} \leq z \leq 1\}$. A transformação tem o objetivo de levar os quatro pontos $(-\frac{n}{f},-\frac{n}{f},\frac{n}{f}),(\frac{n}{f},-\frac{n}{f},\frac{n}{f}),(-\frac{n}{f},\frac{n}{f},\frac{n}{f}),(\frac{n}{f},\frac{n}{f},\frac{n}{f})$ para as coordenadas $(-1,-1,0),(1,-1,0),(-1,1,0),(1,1,0)$, arrastando o restante do espaço junto a eles, deformando nosso frustum em um paralelepípedo.
 
@@ -63,9 +77,11 @@ M_2 = \begin{bmatrix} \frac{d}{s_u \cdot f} & 0 & 0 & 0 \\\ 0 & \frac{d}{s_v \cd
 T = \begin{bmatrix} 1 & 0 & 0 & 0 \\\ 0 & 1 & 0 & 0 \\\ 0 & 0 & \frac{1}{1-z_0} & \frac{-z_0}{1 - z_0} \\\ 0 & 0 & 1 & 0 \end{bmatrix}
 ```
 
-- Veja que essa transformação faz o deslocamento do espaço um pouco para trás e depois o expande para preservar a posição do plano posterior enquanto leva o anterior para zero. Porém, ainda temos um formato de frustum, e não um paralelepípedo. Para corrigir isso, guardaremos em cada ponto seu valor antigo da coordeanda $z$ na quarta dimensão adicional $w$. Isso acontece pois com essa informação, agora podemos usar o OpenGL para dividir as coordenadas dos eixos $X,Y$ por o valor guardado da coordeanda $z$, que tem o efeito de levar as bordas da pirâmide às bordas do paralelepípedo, como queríamos.
+- Veja que essa transformação faz o deslocamento do espaço um pouco para trás e depois o expande para preservar a posição do plano posterior enquanto leva o anterior para zero. Porém, ainda temos um formato de frustum, e não um paralelepípedo. Para corrigir isso, guardaremos em cada ponto seu valor antigo da coordenada $z$ na quarta dimensão adicional $w$. Isso acontece pois com essa informação, agora podemos usar o OpenGL para dividir as coordenadas dos eixos $X,Y$ pelo valor guardado da coordenada $z$, que tem o efeito de levar as bordas da pirâmide às bordas do paralelepípedo, como queríamos.
 
 - Dado o espaço de visualização, um objeto ser visível implica que suas coordenadas $(x,y,z)$ pós processamento do OpenGL obedecem $x \in [-1,1], y \in [-1,1], z \in [0,1]$, que pode ser feito facilmente pelo computador em um tempo rápido. Além disso, o objeto visível em caso de sobreposições será aquele com menor coordenada $z$ entre as opções com mesmo par $(x,y)$.
+
+- Por último, a transformação $D$ leva o paralelepípedo de visão para o espaço do dispositivo, definido por $X_{min} \leq x \leq X_{max},\; Y_{min} \leq y \leq Y_{max},\; Z_{min} \leq z \leq Z_{max}$. Esse mapeamento é feito em três etapas: uma translação e escala $K$ que leva o paralelepípedo ao cubo $[0,1]^3$, um escalamento e translação $L$ que leva esse cubo à moldura do dispositivo e um arredondamento $R$ para as coordenadas do pixel virtual mais próximo. A matriz completa de mapeamento do espaço de cena para o espaço de dispositivo é $D \cdot T \cdot M \cdot V$.
 
 ## 3 - Representações
 
