@@ -1,10 +1,11 @@
-Digite no terminal uma linha por vez.
+Dentro da **pasta vazia** que você quer que o projeto seja instalado, digite no terminal uma linha por vez.
 
 **Windows**
 
 ```
-python -m venv venv
-.\venv\Scripts\activate
+git clone https://github.com/Vitinholiv/Camera3D.git .
+python -m venv .venv
+.\.venv\Scripts\activate
 pip install -r requirements.txt
 python main.py
 ```
@@ -12,8 +13,9 @@ python main.py
 **Linux/MacOS**
 
 ```
-python3 -m venv venv
-source venv/bin/activate
+git clone https://github.com/Vitinholiv/Camera3D.git .
+python3 -m venv .venv
+source .venv/bin/activate 
 pip install -r requirements.txt
 python3 main.py
 ```
