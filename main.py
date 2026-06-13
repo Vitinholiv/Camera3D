@@ -222,10 +222,7 @@ def main():
 
         # UI
         mode_label = "Câmera - Padrão" if cam_mode == "STANDARD" else "Câmera - Restrita"
-        draw_ui(current_w, current_h, delta_w, delta_h, c_w, c_h,
-                sliders_data[cam_mode],
-                [btn_cam_mode, btn_frustum],
-                mode_label, params)
+        draw_ui(current_w, current_h, delta_w, delta_h, c_w, c_h, sliders_data[cam_mode], [btn_cam_mode, btn_frustum], mode_label, params, cam, obs)
 
         pygame.display.flip()
         clock.tick(60)
