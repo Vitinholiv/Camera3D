@@ -118,4 +118,5 @@ world_objects = [
     MeshObject(filename="horse.obj", position=[0, 0, 30], rotation=[-90, 0, 90], scale=0.0025, color=(0.35, 0.25, 0.2)),
     MeshObject(filename="plane.obj", position=[0, 40, 0], rotation=[-90, 0, 90], scale=1.5, color=(0.9, 0.25, 0.5)),
     MeshObject(filename="rj.obj", position=[45, 0, 0], rotation=[-90, 0, 0], scale=0.01, color=(0.0420, 0.24, 0.67)),
+    MeshObject(filename="dualramid.obj", position=[0, 0, 0], rotation=[0, 0, 0], scale=1, color=(0.25, 0.25, 0.9)),
 ]

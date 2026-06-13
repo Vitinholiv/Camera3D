@@ -127,12 +127,12 @@ def draw_ui(current_w, current_h, delta_w, delta_h, c_w, c_h,
     hud_x = delta_w + 15
     hud_y = delta_h + 15
     
-    draw_text(f"(pitch,yaw): ({obs.pitch:.1f}, {obs.yaw:.1f})", hud_x, hud_y, color=(0, 255, 255))
-    draw_text(f"(x,y,z): ({obs.pos[0]:.1f}, {obs.pos[1]:.1f}, {obs.pos[2]:.1f})", hud_x, hud_y + 20, color=(0, 255, 255))
+    draw_text(f"(pitch,yaw): ({obs.pitch:.2f}, {obs.yaw:.2f})", hud_x, hud_y, color=(0, 255, 255))
+    draw_text(f"(x,y,z): ({obs.pos[0]:.2f}, {obs.pos[1]:.2f}, {obs.pos[2]:.2f})", hud_x, hud_y + 20, color=(0, 255, 255))
     draw_text("[Observer]", hud_x, hud_y + 40, color=(0, 255, 255))
     
-    draw_text(f"(pitch,yaw): ({cam.pitch:.1f}, {cam.yaw:.1f})", hud_x, hud_y + 75, color=(255, 215, 0))
-    draw_text(f"(x,y,z): ({params.C[0]:.1f}, {params.C[1]:.1f}, {params.C[2]:.1f})", hud_x, hud_y + 95, color=(255, 215, 0))
+    draw_text(f"(pitch,yaw): ({cam.pitch:.2f}, {cam.yaw:.2f})", hud_x, hud_y + 75, color=(255, 215, 0))
+    draw_text(f"(x,y,z): ({params.C[0]:.2f}, {params.C[1]:.2f}, {params.C[2]:.2f})", hud_x, hud_y + 95, color=(255, 215, 0))
     draw_text("[Camera]", hud_x, hud_y + 115, color=(255, 215, 0))
 
     btn_list = buttons if isinstance(buttons, (list, tuple)) else [buttons]
